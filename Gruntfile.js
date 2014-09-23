@@ -17,17 +17,18 @@ module.exports = function (grunt) {
 	grunt.initConfig({
 		svg_extend: {
 			all: {
+				options: {
+					pngsource: 'images/dist/png/',
+					svgtest: 'no-svg'
+				},
+				output: '_icons',
 				source: 'images/dist/svg/',
-				target: 'css/scss/',
-				scssName: '_icons'
+				target: 'css/scss/'
 			}
 		}
 	});
 
-	// Actually load this plugin's task(s).
 	grunt.loadTasks('tasks');
 
-	// By default, lint and run all tests.
 	grunt.registerTask('default', ['svg_extend']);
-
 };

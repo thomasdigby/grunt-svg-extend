@@ -26,9 +26,13 @@ In your project's Gruntfile, add a section named `svg_extend` to the data object
 grunt.initConfig({
 	svg_extend: {
 		all: {
-			source: 'images/svg/',
-			target: 'css/scss/',
-			scssName: '_icons'
+			options: {
+				pngsource: 'images/dist/png/',
+				svgtest: 'no-svg'
+			},
+			output: '_icons',
+			source: 'images/dist/svg/',
+			target: 'css/scss/'
 		}
 	}
 });
@@ -40,26 +44,40 @@ grunt.initConfig({
 Type: `String`
 Default value: null
 
-Source directory of SVG files, cannot contain more than a single level.
+Source directory of .svg files, cannot contain more than a single level.
 
 #### target
 Type: `String`
 Default value: null
 
-Target directory of SCSS file.
+Target directory of .scss file.
 
-#### scssName
+#### output
 Type: `String`
 Default value: null
 
 Name for the .scss file.
+
+#### options.pngsource
+Type: `String`
+Default value: null
+
+Source directory of the fallback .png file.
+
+#### options.svgtest
+Type: `String`
+Default value: `no-svg`
+
+Class used to detect fallback to png, default is modernizr's 'no-svg'.
 
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
-0.0.1: Initial commit
+*	v0.1.0	Added PNG fallback option, choose a test class (e.g. no-svg) and a path to the fallback .png
+*	v0.0.2	Update to package.json
+*	v0.0.1	Initial commit
 
 ## License
 Copyright (c) 2014 Thomas Digby. Licensed under the MIT license.

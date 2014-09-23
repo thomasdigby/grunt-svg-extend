@@ -17,23 +17,25 @@ module.exports = function (grunt) {
 
 		var path = require('path'),
 			cheerio = require('cheerio'),
-			options = this.data,
+			data = this.data,
 			imgArray = [],
 			source,
 			target,
-			name,
+			output,
+			requirePng = false,
+			svgTest = 'no-svg',
 			scss;
 
 		// if no source declared, throw error
-		if (!options.source) {
+		if (!data.source) {
 			throw new Error('SVG source folder must be defined');
 		}
 
 		// init
-		init(options);
+		init(data);
 
 		// main
-		function init(options) {
+		function init() {
 
 			// get params from gruntfile.js
 			getCustomParams();
@@ -86,13 +88,15 @@ module.exports = function (grunt) {
 
 				// create svg string & remove newlines, tabs & comments
 				var svgPrefix = "data:image/svg+xml;charset=US-ASCII,",
-					encodedURI = svgPrefix + encodeURIComponent(icon.svg.replace(/[\n\r]/gmi, "").replace(/\t/gmi, " ").replace(/<\!\-\-(.*(?=\-\->))\-\->/gmi, "").replace(/'/gmi, "\\i"));
+					encodedURI = svgPrefix + encodeURIComponent(icon.svg.replace(/[\n\r]/gmi, "").replace(/\t/gmi, " ").replace(/<\!\-\-(.*(?=\-\->))\-\->/gmi, "").replace(/'/gmi, "\\i")),
+					pngCode = '.' + svgTest + ' & { background-image: url(\'images/dest/png/' + icon.id + '.png\'); }',
+					fallback = requirePng ? pngCode : '';
 
 				// create
-				var className = icon.id,
-					css = [
-					'%' + className + ' {',
+				var css = [
+					'%' + icon.id + ' {',
 						'background-image: url(\'' + encodedURI + '\');',
+						fallback,
 					'}'
 					].join('');
 
@@ -128,10 +132,14 @@ module.exports = function (grunt) {
 		};
 		function getCustomParams() {
 			// save params
-			source = path.normalize(options.source + '/');
-			target = path.normalize(options.target + '/');
-			name = options.scssName;
-			scss = target + name + '.scss';
+			source = path.normalize(data.source + '/');
+			target = path.normalize(data.target + '/');
+			output = data.output;
+			scss = target + output + '.scss';
+			if (data.options != undefined) {
+				svgTest = data.options.svgtest != undefined ? data.options.svgtest : 'no-svg';
+				requirePng = data.options.pngsource != undefined ? data.options.pngsource : '/';
+			}
 		};
 	});
 };
