@@ -18,10 +18,7 @@ module.exports = function (grunt) {
 			all: {
 				source: 'images/dist/svg/',
 				target: 'css/scss/',
-				options: {
-					pngPath: 'images/dist/png/'
-				}
-				//outputname: '_icons'
+				scssName: '_icons'
 			}
 		}
 	});
