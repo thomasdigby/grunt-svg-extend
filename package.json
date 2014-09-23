@@ -1,0 +1,28 @@
+{
+	"name": "grunt-svg-extend",
+	"version": "0.0.1",
+	"description": "Converts SVG files to a series of SASS placeholders with base64 encoded SVGs and PNG fallbacks",
+	"homepage": "https://github.com/thomasdigby/grunt-svg-extend.git",
+	"repository": "https://github.com/thomasdigby/grunt-svg-extend.git",
+	"author": {
+		"name": "Thomas Digby",
+		"email": "thomasdigby1@gmail.com",
+		"url": "thomasdig.by"
+	},
+	"keywords": [
+		"gruntplugin"
+	],
+	"main": "Gruntfile.js",
+	"engines": {
+		"node": ">= 0.8.0"
+	},
+	"license": "MIT",
+	"devDependencies": {
+		"grunt": "~0.4.2",
+		"jshint-stylish": "~0.1.5",
+		"load-grunt-tasks": "~0.3.0"
+	},
+	"dependencies": {
+		"cheerio": "~0.12.2"
+	}
+}
