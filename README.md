@@ -29,6 +29,7 @@ grunt.initConfig({
 	svgextend: {
 		all: {
 			options: {
+				requirepng: true,
 				pngsource: 'images/dist/png/',
 				svgtest: 'no-svg'
 			},
@@ -83,6 +84,7 @@ Class used to detect fallback to png, default is modernizr's 'no-svg'.
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+*	v0.1.4	Updated task overview
 *	v0.1.3	Fixed PNG issues
 *	v0.1.2	Removed underscore from 'svgextend' & added more useful grunt logs
 *	v0.1.1	Fixed PNG path issue and updated readme
