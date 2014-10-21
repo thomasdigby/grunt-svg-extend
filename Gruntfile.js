@@ -15,11 +15,12 @@ module.exports = function (grunt) {
 
 	// Project configuration.
 	grunt.initConfig({
-		svg_extend: {
+		svgextend: {
 			all: {
 				options: {
-					pngsource: 'images/dist/png/',
-					svgtest: 'no-svg'
+					requirepng: true,
+					pngsource: '/images/dist/png/',
+					svgtest: 'no-svgsyo'
 				},
 				output: '_icons',
 				source: 'images/dist/svg/',
@@ -30,5 +31,5 @@ module.exports = function (grunt) {
 
 	grunt.loadTasks('tasks');
 
-	grunt.registerTask('default', ['svg_extend']);
+	grunt.registerTask('default', ['svgextend']);
 };

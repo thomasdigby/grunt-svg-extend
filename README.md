@@ -1,6 +1,8 @@
 # grunt-svg-extend
 
-> Converts SVG files to a series of SASS placeholders with base64 encoded SVGs
+> Converts SVG files to a series of SASS placeholders with encoded SVGs and optional PNG fallbacks. It should ease the process of creating UI icons for a site, and provide good browser support with the PNG fallback.
+
+> I recommend combining this task with [grunt-svgmin](https://www.npmjs.org/package/grunt-svgmin) and [grunt-svg2png](https://www.npmjs.org/package/grunt-svg2png) to create a workflow that is entirely automated.
 
 ## Getting Started
 This plugin requires Grunt.
@@ -17,14 +19,14 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-svg-extend');
 ```
 
-## The "svg_extend" task
+## The "svgextend" task
 
 ### Overview
-In your project's Gruntfile, add a section named `svg_extend` to the data object passed into `grunt.initConfig()`.
+In your project's Gruntfile, add a section named `svgextend` to the data object passed into `grunt.initConfig()`.
 
 ```js
 grunt.initConfig({
-	svg_extend: {
+	svgextend: {
 		all: {
 			options: {
 				pngsource: 'images/dist/png/',
@@ -58,6 +60,12 @@ Default value: null
 
 Name for the .scss file.
 
+#### options.requirepng
+Type: `String`
+Default value: false
+
+Set true if PNG fallbacks are declared
+
 #### options.pngsource
 Type: `String`
 Default value: null
@@ -75,6 +83,9 @@ Class used to detect fallback to png, default is modernizr's 'no-svg'.
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+*	v0.1.3	Fixed PNG issues
+*	v0.1.2	Removed underscore from 'svgextend' & added more useful grunt logs
+*	v0.1.1	Fixed PNG path issue and updated readme
 *	v0.1.0	Added PNG fallback option, choose a test class (e.g. no-svg) and a path to the fallback .png
 *	v0.0.2	Update to package.json
 *	v0.0.1	Initial commit

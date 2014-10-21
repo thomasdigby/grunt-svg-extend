@@ -1,4 +1,4 @@
-/*
+﻿/*
  * grunt-svg-extend
  * https://github.com/thomasdigby/grunt-svg-extend.git
  *
@@ -13,7 +13,7 @@ module.exports = function (grunt) {
 	// Please see the Grunt documentation for more information regarding task
 	// creation: http://gruntjs.com/creating-tasks
 
-	grunt.registerMultiTask('svg_extend', 'Converts SVG files to a series of SASS placeholders with base64 encoded SVGs and optional PNG fallbacks', function () {
+	grunt.registerMultiTask('svgextend', 'Converts SVG files to a series of SASS placeholders with encoded SVGs and optional PNG fallbacks', function () {
 
 		var path = require('path'),
 			cheerio = require('cheerio'),
@@ -22,7 +22,8 @@ module.exports = function (grunt) {
 			source,
 			target,
 			output,
-			requirePng = false,
+			requirePng = data.options.requirepng ? data.options.requirepng : false,
+			pngSource,
 			svgTest = 'no-svg',
 			scss;
 
@@ -71,12 +72,11 @@ module.exports = function (grunt) {
 
 			// if no svgs are found, return error
 			if (i == 0) {
-				console.log(source + ' contains no SVGs');
+				grunt.log.errorlns(source + ' contains no SVGs');
 				console.log('');
 			} else {
 				console.log('');
-				console.log('> ' + imgArray.length + ' icons created');
-				console.log('');
+				grunt.log.ok(imgArray.length + ' icons created');
 				callback();
 			}
 		};
@@ -89,7 +89,7 @@ module.exports = function (grunt) {
 				// create svg string & remove newlines, tabs & comments
 				var svgPrefix = "data:image/svg+xml;charset=US-ASCII,",
 					encodedURI = svgPrefix + encodeURIComponent(icon.svg.replace(/[\n\r]/gmi, "").replace(/\t/gmi, " ").replace(/<\!\-\-(.*(?=\-\->))\-\->/gmi, "").replace(/'/gmi, "\\i")),
-					pngCode = '.' + svgTest + ' & { background-image: url(\'images/dest/png/' + icon.id + '.png\'); }',
+					pngCode = '.' + svgTest + ' & { background-image: url(\'' + pngSource + icon.id + '.png\'); }',
 					fallback = requirePng ? pngCode : '';
 
 				// create
@@ -131,14 +131,17 @@ module.exports = function (grunt) {
 			}
 		};
 		function getCustomParams() {
+
 			// save params
 			source = path.normalize(data.source + '/');
 			target = path.normalize(data.target + '/');
 			output = data.output;
 			scss = target + output + '.scss';
-			if (data.options != undefined) {
+
+			// if pngs are required
+			if (requirePng) {
 				svgTest = data.options.svgtest != undefined ? data.options.svgtest : 'no-svg';
-				requirePng = data.options.pngsource != undefined ? data.options.pngsource : '/';
+				pngSource = data.options.pngsource != undefined ? data.options.pngsource : '/';
 			}
 		};
 	});
