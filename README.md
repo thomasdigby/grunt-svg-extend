@@ -1,8 +1,8 @@
 # grunt-svg-extend
 
-> Converts SVG files to a series of SASS placeholders with encoded SVGs and optional PNG fallbacks. It should ease the process of creating UI icons for a site, and provide good browser support with the PNG fallback.
+> Converts SVG files to a series of SASS placeholders or mixins with encoded SVGs and optional PNG fallbacks. It should ease the process of creating UI icons for a site, and provide good browser support with the PNG fallback.
 
-> I recommend combining this task with [grunt-svgmin](https://www.npmjs.org/package/grunt-svgmin) and [grunt-svg2png](https://www.npmjs.org/package/grunt-svg2png) to create a workflow that is entirely automated.
+> I recommend combining this task with [grunt-svgmin](https://www.npmjs.org/package/grunt-svgmin) and [grunt-svg2png](https://www.npmjs.org/package/grunt-svg2png) to create a UI workflow that is entirely automated.
 
 ## Getting Started
 This plugin requires Grunt.
@@ -35,7 +35,8 @@ grunt.initConfig({
 			},
 			output: '_icons',
 			source: 'images/dist/svg/',
-			target: 'css/scss/'
+			target: 'css/scss/',
+			type: 'mixin'
 		}
 	}
 });
@@ -43,47 +44,54 @@ grunt.initConfig({
 
 ### Options
 
+#### output
+Type: `String`
+Default value: `null`
+
+Name for the `.scss` file.
+
 #### source
 Type: `String`
-Default value: null
+Default value: `null`
 
-Source directory of .svg files, cannot contain more than a single level.
+Source directory of `.svg` files, cannot contain more than a single level.
 
 #### target
 Type: `String`
-Default value: null
+Default value: `null`
 
-Target directory of .scss file.
+Target directory of `.scss` file.
 
-#### output
+#### type
 Type: `String`
-Default value: null
+Default value: `placeholder`
 
-Name for the .scss file.
+Sass function to use when outputing the icon set, defaults to `placeholder` but can be changed to `mixin`. 
 
 #### options.requirepng
 Type: `String`
-Default value: false
+Default value: `false`
 
-Set true if PNG fallbacks are declared
+Set true if `.png` fallbacks are declared
 
 #### options.pngsource
 Type: `String`
-Default value: null
+Default value: `null`
 
-Source directory of the fallback .png file.
+Source directory of the fallback `.png` file.
 
 #### options.svgtest
 Type: `String`
 Default value: `no-svg`
 
-Class used to detect fallback to png, default is modernizr's 'no-svg'.
+Class used to detect fallback to `.png`, default is modernizr's `no-svg`.
 
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+*	v0.1.5	Included mixin option for implementation within media queries
 *	v0.1.4	Updated task overview
 *	v0.1.3	Fixed PNG issues
 *	v0.1.2	Removed underscore from 'svgextend' & added more useful grunt logs

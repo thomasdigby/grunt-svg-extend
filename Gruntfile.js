@@ -20,11 +20,12 @@ module.exports = function (grunt) {
 				options: {
 					requirepng: true,
 					pngsource: '/images/dist/png/',
-					svgtest: 'no-svgsyo'
+					svgtest: 'no-svg'
 				},
 				output: '_icons',
 				source: 'images/dist/svg/',
-				target: 'css/scss/'
+				target: 'css/scss/',
+				type: 'mixin'
 			}
 		}
 	});

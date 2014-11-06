@@ -25,7 +25,8 @@ module.exports = function (grunt) {
 			requirePng = data.options.requirepng ? data.options.requirepng : false,
 			pngSource,
 			svgTest = 'no-svg',
-			scss;
+			scss,
+			mixin = false;
 
 		// if no source declared, throw error
 		if (!data.source) {
@@ -90,15 +91,25 @@ module.exports = function (grunt) {
 				var svgPrefix = "data:image/svg+xml;charset=US-ASCII,",
 					encodedURI = svgPrefix + encodeURIComponent(icon.svg.replace(/[\n\r]/gmi, "").replace(/\t/gmi, " ").replace(/<\!\-\-(.*(?=\-\->))\-\->/gmi, "").replace(/'/gmi, "\\i")),
 					pngCode = '.' + svgTest + ' & { background-image: url(\'' + pngSource + icon.id + '.png\'); }',
-					fallback = requirePng ? pngCode : '';
+					fallback = requirePng ? pngCode : '',
+					css;
 
 				// create
-				var css = [
+				if (mixin) {
+					css = [
+					'@mixin ' + icon.id + '() {',
+						'background-image: url(\'' + encodedURI + '\');',
+						fallback,
+					'}'
+					].join('');
+				} else {
+					css = [
 					'%' + icon.id + ' {',
 						'background-image: url(\'' + encodedURI + '\');',
 						fallback,
 					'}'
 					].join('');
+				}
 
 				content.push(css);
 			});
@@ -137,6 +148,7 @@ module.exports = function (grunt) {
 			target = path.normalize(data.target + '/');
 			output = data.output;
 			scss = target + output + '.scss';
+			mixin = data.type === 'mixin';
 
 			// if pngs are required
 			if (requirePng) {
