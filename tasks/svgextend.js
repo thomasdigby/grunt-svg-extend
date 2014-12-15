@@ -10,151 +10,196 @@
 
 module.exports = function (grunt) {
 
-	// Please see the Grunt documentation for more information regarding task
-	// creation: http://gruntjs.com/creating-tasks
+	// External dependencies
+	var path = require('path'),
+		cheerio = require('cheerio');
 
-	grunt.registerMultiTask('svgextend', 'Converts SVG files to a series of SASS placeholders with encoded SVGs and optional PNG fallbacks', function () {
+	// Register task
+	grunt.registerMultiTask('svgextend', 'Grunt task for converting SVGs to embedded data-uris', function () {
 
-		var path = require('path'),
-			cheerio = require('cheerio'),
-			data = this.data,
-			imgArray = [],
-			source,
-			target,
-			output,
-			requirePng = data.options.requirepng ? data.options.requirepng : false,
-			pngSource,
-			svgTest = 'no-svg',
-			scss,
-			mixin = false;
+		var params = this.data,
+			options = this.options({
+				requirePng: false,
+				pngDir: 'images/dist/png/',
+				featureTest: 'no-svg'
+			}),
+			inputArray = [],
+			outputContent = ['/* Compiled by grunt-svg-extend */'],
+			outputFile = params.outputType === 'class' ? '.css' : '.scss';
 
-		// if no source declared, throw error
-		if (!data.source) {
-			throw new Error('SVG source folder must be defined');
-		}
+		// initiate grunt task
+		var init = function () {
 
-		// init
-		init(data);
-
-		// main
-		function init() {
-
-			// get params from gruntfile.js
-			getCustomParams();
-
-			// create directory
-			createDir();
-
-			// get all images from source folder
-			collectImg(function () {
-				createScss();
+			// get all svg's from source directory
+			collectInput(function () {
+				createOutput();
 			});
 		};
-		function collectImg(callback) {
+
+		var collectInput = function (cb) {
 
 			var i = 0;
-			// spacer
-			console.log('');
+
+			// test input directory
+			if (!grunt.file.exists(path.normalize(params.inputDir + '/'))) {
+				grunt.log.writeln('');
+				grunt.fail.warn('Please ensure input directory path is correct');
+			}
 
 			// for each file in source directory
-			grunt.file.recurse(source, function (abspath, rootdir, subdir, filename) {
+			grunt.file.recurse(params.inputDir, function (abspath, rootdir, subdir, filename) {
 
 				// log out name
-				console.log(filename);
+				grunt.log.writeln(filename);
 
 				// if file is svg, add to array
 				if (path.extname(filename) === '.svg') {
-					addToArray(source + '/' + filename);
+
+					var id = filename.replace(/\.min.svg/g, '');
+
+					pushToArray(id, abspath);
 					i++;
 				} else {
 					return;
 				}
 			});
 
-			// if no svgs are found, return error
-			if (i == 0) {
-				grunt.log.errorlns(source + ' contains no SVGs');
-				console.log('');
-			} else {
-				console.log('');
-				grunt.log.ok(imgArray.length + ' icons created');
-				callback();
-			}
-		};
-		function createScss() {
-
-			var content = ['/* Compiled by grunt-svg-extend */'];
-
-			imgArray.forEach(function (icon) {
-
-				// create svg string & remove newlines, tabs & comments
-				var svgPrefix = "data:image/svg+xml;charset=US-ASCII,",
-					encodedURI = svgPrefix + encodeURIComponent(icon.svg.replace(/[\n\r]/gmi, "").replace(/\t/gmi, " ").replace(/<\!\-\-(.*(?=\-\->))\-\->/gmi, "").replace(/'/gmi, "\\i")),
-					pngCode = '.' + svgTest + ' & { background-image: url(\'' + pngSource + icon.id + '.png\'); }',
-					fallback = requirePng ? pngCode : '',
-					css;
-
-				// create
-				if (mixin) {
-					css = [
-					'@mixin ' + icon.id + '() {',
-						'background-image: url(\'' + encodedURI + '\');',
-						fallback,
-					'}'
-					].join('');
-				} else {
-					css = [
-					'%' + icon.id + ' {',
-						'background-image: url(\'' + encodedURI + '\');',
-						fallback,
-					'}'
-					].join('');
-				}
-
-				content.push(css);
-			});
-
-			grunt.file.write(scss, content.join("\n").replace(/\.min/g, ""));
+			// callback
+			cb();
 		};
 
-		// utils
-		function addToArray(file) {
+		var pushToArray = function (id, svg) {
 
-			var id = path.basename(file, '.svg'),
-				svgXml = grunt.file.read(file),
+			// collate svg data
+			var id = path.basename(id),
+				svgXml = grunt.file.read(svg),
 				$ = cheerio.load(svgXml, {
 					ignoreWhitespace: false,
 					xmlMode: true
 				});
 
-			imgArray.push({
+			// push svg to input array
+			inputArray.push({
 				id: id,
 				svg: $.root().html().toString()
 			});
 		};
-		function createDir() {
-			// if target directory does not exist
-			if (!grunt.file.exists(target)) {
-				console.log('');
-				console.log('> ' + scss + ' created');
-				// create directory
-				grunt.file.mkdir(target);
-			}
-		};
-		function getCustomParams() {
 
-			// save params
-			source = path.normalize(data.source + '/');
-			target = path.normalize(data.target + '/');
-			output = data.output;
-			scss = target + output + '.scss';
-			mixin = data.type === 'mixin';
+		// Create output file
+		var createOutput = function () {
+
+			var targetDir = path.normalize(params.outputDir + '/'),
+				targetFile = params.outputDir + params.outputName + outputFile;
+
+			if (inputArray.length < 1) {
+				grunt.log.writeln('');
+				grunt.fail.warn('No SVGs found');
+			}
+
+			inputArray.forEach(function (icon) {
+
+				// create svg string & remove newlines, tabs & comments
+				var prefix = "data:image/svg+xml;charset=US-ASCII,",
+					encodedUri = prefix + encodeURIComponent(icon.svg.replace(/[\n\r]/gmi, "").replace(/\t/gmi, " ").replace(/<\!\-\-(.*(?=\-\->))\-\->/gmi, "").replace(/'/gmi, "\\i"));
+
+				// test input directory
+				if (params.outputType !== 'placeholder' && params.outputType !== 'mixin' && params.outputType !== 'class') {
+					grunt.log.writeln('');
+					grunt.fail.warn('outputType needs to be one of placeholder, mixin or class');
+				}
+
+				switch (params.outputType) {
+					case 'placeholder':
+						createPlaceholder(icon.id, encodedUri);
+						break;
+					case 'mixin':
+						createMixin(icon.id, encodedUri);
+						break;
+					case 'class':
+						createClass(icon.id, encodedUri);
+						break;
+				}
+			});
+
+			if (!grunt.file.exists(targetDir)) {
+				grunt.file.mkdir(targetDir);
+			}
+
+			// log out name
+			grunt.log.writeln('');
+			grunt.log.writeln(targetFile + ' created');
+			grunt.file.write(targetFile, outputContent.join('\n'));
+		};
+		var createPlaceholder = function (id, svg) {
+
+			var outputFallback;
 
 			// if pngs are required
-			if (requirePng) {
-				svgTest = data.options.svgtest != undefined ? data.options.svgtest : 'no-svg';
-				pngSource = data.options.pngsource != undefined ? data.options.pngsource : '/';
+			if (options.requirePng) {
+				outputFallback = [
+					'.' + options.featureTest + ' & {',
+						'background-image: url(\'' + options.pngSource + id + '.png\');',
+					'}'
+				].join('');
 			}
+
+			// create placeholder object
+			var output = [
+					'%' + id + ' {',
+						'background-image: url(\'' + svg + '\');',
+						outputFallback,
+					'}'
+				].join('');
+
+			outputContent.push(output);
 		};
+		var createMixin = function (id, svg) {
+
+			var outputFallback;
+
+			// if pngs are required
+			if (options.requirePng) {
+				outputFallback = [
+					'.' + options.featureTest + ' & {',
+						'background-image: url(\'' + options.pngSource + id + '.png\');',
+					'}'
+				].join('');
+			}
+
+			// create mixin object
+			var output = [
+				'@mixin ' + id + '() {',
+					'background-image: url(\'' + svg + '\');',
+					outputFallback,
+				'}'
+			].join('');
+
+			outputContent.push(output);
+		};
+		var createClass = function (id, svg) {
+
+			var outputFallback;
+
+			// if pngs are required
+			if (options.requirePng) {
+				outputFallback = [
+					'.' + options.featureTest + ' .' + id + ' {',
+						'background-image: url(\'' + options.pngDir + id + '.png\');',
+					'}'
+				].join('');
+			}
+
+			// create class and declaration block
+			var output = [
+				'.' + id + ' {',
+					'background-image: url(\'' + svg + '\');',
+				'}',
+				outputFallback,
+			].join('');
+
+			outputContent.push(output);
+		};
+
+		init();
 	});
 };

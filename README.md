@@ -1,8 +1,8 @@
 # grunt-svg-extend
 
-> Converts SVG files to a series of SASS placeholders or mixins with encoded SVGs and optional PNG fallbacks. It should ease the process of creating UI icons for a site, and provide good browser support with the PNG fallback.
+> Grunt task for converting SVGs to embedded data-uris, outputting a series of SASS placeholders/mixins or CSS selectors. You can specify a PNG fallback location and combine it with a feature test to provide a fallback for unsupporting browsers.
 
-> I recommend combining this task with [grunt-svgmin](https://www.npmjs.org/package/grunt-svgmin) and [grunt-svg2png](https://www.npmjs.org/package/grunt-svg2png) to create a UI workflow that is entirely automated.
+> Recommended to combine this task with [grunt-svgmin](https://www.npmjs.org/package/grunt-svgmin) and [grunt-svg2png](https://www.npmjs.org/package/grunt-svg2png) to create an automated UI workflow without the overheads of other grunt icon solutions.
 
 ## Getting Started
 This plugin requires Grunt.
@@ -29,14 +29,14 @@ grunt.initConfig({
 	svgextend: {
 		all: {
 			options: {
-				requirepng: true,
-				pngsource: 'images/dist/png/',
-				svgtest: 'no-svg'
+				requirePng: true,
+				pngDir: '/images/dist/png/',
+				featureTest: 'no-svg'
 			},
-			output: '_icons',
-			source: 'images/dist/svg/',
-			target: 'css/scss/',
-			type: 'mixin'
+			inputDir: 'images/dist/svg/',
+			outputDir: 'css/scss/',
+			outputName: '_icons',
+			outputType: 'mixin'
 		}
 	}
 });
@@ -44,53 +44,56 @@ grunt.initConfig({
 
 ### Options
 
-#### output
+#### inputDir
 Type: `String`
 Default value: `null`
 
-Name for the `.scss` file.
+Source directory of input SVG files, cannot (currently) contain more than a single level.
 
-#### source
+#### outputDir
 Type: `String`
 Default value: `null`
 
-Source directory of `.svg` files, cannot contain more than a single level.
+Target directory for output file.
 
-#### target
+#### outputName
 Type: `String`
 Default value: `null`
 
-Target directory of `.scss` file.
+Name for the output file.
 
-#### type
+#### outputType
 Type: `String`
-Default value: `placeholder`
+Default value: `null`
 
-Sass function to use when outputing the icon set, defaults to `placeholder` but can be changed to `mixin`. 
+Choose either `placeholder`, `mixin` or `class`. This will output either a `.scss` or `.css` file dependent on the choice of a regular selector or a SASS feature.
 
-#### options.requirepng
+
+#### options.pngDir
+Type: `String`
+Default value: `images/dist/png/`
+
+Source directory of the fallback PNG file.
+
+#### options.requirePng
 Type: `String`
 Default value: `false`
 
-Set true if `.png` fallbacks are declared
+Set to true if PNG fallback is required.
 
-#### options.pngsource
-Type: `String`
-Default value: `null`
-
-Source directory of the fallback `.png` file.
-
-#### options.svgtest
+#### options.featureTest
 Type: `String`
 Default value: `no-svg`
 
-Class used to detect fallback to `.png`, default is modernizr's `no-svg`.
+Class used to detect fallback, default is modernizr's `no-svg`.
 
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
+*	v1.0.0  Rewritten to include a number of outputs: placeholder, mixin and class selector. Improved parameter names, better error handling and a few bug fixes.
+
 *	v0.1.5	Included mixin option for implementation within media queries
 *	v0.1.4	Updated task overview
 *	v0.1.3	Fixed PNG issues

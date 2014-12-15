@@ -18,14 +18,14 @@ module.exports = function (grunt) {
 		svgextend: {
 			all: {
 				options: {
-					requirepng: true,
-					pngsource: '/images/dist/png/',
-					svgtest: 'no-svg'
+					requirePng: true,
+					pngDir: 'images/dist/png/',
+					featureTest: 'no-svg'
 				},
-				output: '_icons',
-				source: 'images/dist/svg/',
-				target: 'css/scss/',
-				type: 'mixin'
+				inputDir: 'images/dist/svg/',
+				outputDir: 'css/scss/',
+				outputName: '_icons',
+				outputType: 'mixin'
 			}
 		}
 	});
